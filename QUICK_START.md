@@ -113,6 +113,10 @@ npm run start       # serve the production build
 npm run typecheck   # TypeScript check
 npm run lint        # Next.js lint
 npm run seed:demo   # reset + seed the local demo semester
+
+npm run check:supabase   # is the real Supabase project ready? (per-table report)
+npm run e2e              # 51 HTTP checks against a running instance
+npm run sync:sql         # regenerate supabase-migrate.sql from the schema
 ```
 
 Stuck? See the troubleshooting table in [README.md](README.md#troubleshooting).

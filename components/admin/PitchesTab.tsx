@@ -218,6 +218,12 @@ export function PitchesTab({
               </Select>
             </div>
 
+            {/*
+              A plain <a>, deliberately: this must be a real browser navigation so
+              the server's Content-Disposition header triggers a download. A
+              next/link would try to client-route to a JSON/CSV endpoint instead.
+            */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/pitches/export?scope=all"
               className="inline-flex h-11 items-center gap-2 rounded-xl border border-lime/40 px-4 text-sm font-semibold text-lime transition hover:bg-lime/10"

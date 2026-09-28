@@ -71,13 +71,19 @@ that is the intended failure, not a silent one.
 
 **A. Existing project (the Hub's)** — Supabase → **SQL Editor → New query**:
 
-1. Optional but advised: `select count(*) from public.pitches;` to see whether old rows exist.
-2. Paste the whole of [`supabase-migrate.sql`](supabase-migrate.sql) and **Run**.
-3. It drops only the PITCHATON tables (`users`, `pitches`, `founders`, `files`, `results`,
-   `hub_news`, `admin_settings`, `email_log`) and rebuilds them. `auth.users`, storage objects and
-   unrelated tables are left untouched.
+1. Optional but advised: run the count query in the file's header first, so you know how many old rows
+   are about to be deleted.
+2. Paste the **whole** of [`supabase-migrate.sql`](supabase-migrate.sql) and **Run** — one paste is
+   enough. It drops the old PITCHATON objects *and* rebuilds them; you do **not** need to run
+   `supabase-schema.sql` afterwards.
+3. Only the PITCHATON tables (`users`, `pitches`, `founders`, `files`, `results`, `hub_news`,
+   `admin_settings`, `email_log`), the `leaderboard` view and the PITCHATON functions are dropped.
+   `auth.users`, storage objects and unrelated tables are left untouched.
 
-**B. Fresh project** — paste [`supabase-schema.sql`](supabase-schema.sql) instead.
+**B. Fresh project** — paste [`supabase-schema.sql`](supabase-schema.sql) instead; it deletes nothing.
+
+Both files are idempotent — re-running is safe, and neither will duplicate a policy. The migration file
+is generated from the schema by `npm run sync:sql`, so the two can never drift apart.
 
 Either way you should see “Success. No rows returned”. This creates the eight tables, indexes, the
 `updated_at` trigger, the auto pitch-code sequence (`PCH-0001`, `PCH-0002`, …), the `leaderboard`

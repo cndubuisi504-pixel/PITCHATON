@@ -103,6 +103,10 @@ pitchaton/
 ├── middleware.ts                  Edge guard for /admin and /dashboard
 ├── supabase-schema.sql            Run once in Supabase — tables, RLS, trigger, storage
 ├── scripts/seed-demo.mjs          Fake semester for local demos
+├── scripts/check-supabase.mjs     Per-table report: is the database ready?
+├── scripts/mock-supabase.mjs      In-memory PostgREST + Storage double for tests
+├── scripts/e2e.mjs                51-check HTTP suite against any running instance
+├── scripts/build-migrate.mjs      Regenerates supabase-migrate.sql from the schema
 └── .env.local.example             Environment template
 ```
 
@@ -118,6 +122,37 @@ pitchaton/
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | Next.js lint |
 | `npm run seed:demo` | Fill the local store with a realistic semester |
+| `npm run check:supabase` | Verify the real Supabase project: every table, the bucket, and what to fix |
+| `npm run e2e` | Run the HTTP test suite against a running instance (`BASE_URL=http://localhost:3000`) |
+| `npm run mock:supabase` | Start the in-memory Supabase double so the production driver can be tested offline |
+| `npm run sync:sql` | Regenerate `supabase-migrate.sql` after editing `supabase-schema.sql` |
+
+### Testing against the production driver
+
+The Supabase code path is the one that matters in production, so it can be exercised with no network
+and no credentials:
+
+```bash
+npm run mock:supabase &                       # fake PostgREST + Storage on 127.0.0.1:3999
+NEXT_PUBLIC_SUPABASE_URL=http://127.0.0.1:3999 \
+SUPABASE_SERVICE_ROLE_KEY=mock-secret npm run dev -- -p 3500
+BASE_URL=http://localhost:3500 npm run e2e     # 51 checks: roles, ownership, gates, CSV, imports
+```
+
+The mock speaks real PostgREST (object requests, count headers, 404s for missing tables), enforces the
+private bucket, and can simulate a broken deployment:
+
+```bash
+MOCK_MISSING=pitches npm run mock:supabase    # missing table → /api/health names it
+MOCK_SERVICE_KEY=secret npm run mock:supabase # wrong key → "Invalid API key"
+```
+
+### The two SQL files
+
+`supabase-schema.sql` creates everything. `supabase-migrate.sql` is **generated** from it by
+`npm run sync:sql` and adds a drop phase so it can be run on a project that already has the old
+prototype's tables. Never hand-edit the migration — regenerate it, or the two files drift and a
+project can end up with weaker policies than the code expects.
 
 ---
 
