@@ -1,66 +1,66 @@
-‎<!DOCTYPE html>
-‎<html lang="en">
-‎<head>
-‎  <meta charset="UTF-8">
-‎  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-‎  <title>PITCHATON | ICT Hub Pitch Competition</title>
-‎  
-‎  <!-- Tailwind CSS -->
-‎  <script src="https://cdn.tailwindcss.com"></script>
-‎  <script>
-‎    tailwind.config = {
-‎      theme: {
-‎        extend: {
-‎          colors: {
-‎            'neon-lime': '#d3ff01',
-‎            'dark-charcoal': '#1a1a1a',
-‎            'accent-gray': '#4d4d4d',
-‎            'card-bg': '#242424',
-‎            'card-border': '#333333',
-‎          }
-‎        }
-‎      }
-‎    }
-‎  </script>
-‎
-‎  <!-- React & Babel for Browser Execution -->
-‎  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-‎  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-‎  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-‎  
-‎  <!-- Supabase JS Client -->
-‎  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-‎  
-‎  <!-- Lucide Icons -->
-‎  <script src="https://unpkg.com/lucide@latest"></script>
-‎
-‎  <style>
-‎    body { background-color: #1a1a1a; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; }
-‎    .glow-effect { box-shadow: 0 0 25px rgba(211, 255, 1, 0.25); }
-‎    ::-webkit-scrollbar { width: 6px; }
-‎    ::-webkit-scrollbar-track { background: #1a1a1a; }
-‎    ::-webkit-scrollbar-thumb { background: #4d4d4d; border-radius: 3px; }
-‎  </style>
-‎</head>
-‎<body>
-‎  <div id="root"></div>
-‎
-‎  <script type="text/babel">
-‎    const { useState, useEffect, useMemo, useRef } = React;
-‎
-‎    // --- SUPABASE CLIENT INITIALIZATION ---
-‎    let defaultUrl = 'https://gqggririspqrzgzwrbyh.supabase.co';
-‎    let defaultKey =  'sb_publishable_uhJY_OZNWTQ1xmTpOW6scg_ksAfR5rz';
-‎
-‎    let supabase = (defaultUrl && defaultKey) 
-‎      ? window.supabase.createClient(defaultUrl, defaultKey) 
-‎      : null;
-‎
-‎    const ADMIN_EMAIL = 'contacteihpitchaton@gmail.com';
-‎    function isAdmin(email) {
-‎      if (!email) return false;
-‎      return email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || email.includes('+admin');
-‎    }    // --- MAIN APP COMPONENT ---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PITCHATON | ICT Hub Pitch Competition</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'neon-lime': '#d3ff01',
+            'dark-charcoal': '#1a1a1a',
+            'accent-gray': '#4d4d4d',
+            'card-bg': '#242424',
+            'card-border': '#333333',
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- React & Babel for Browser Execution -->
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  
+  <!-- Supabase JS Client -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    body { background-color: #1a1a1a; color: #ffffff; font-family: system-ui, -apple-system, sans-serif; }
+    .glow-effect { box-shadow: 0 0 25px rgba(211, 255, 1, 0.25); }
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #1a1a1a; }
+    ::-webkit-scrollbar-thumb { background: #4d4d4d; border-radius: 3px; }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useEffect, useMemo, useRef } = React;
+
+    // --- SUPABASE CLIENT INITIALIZATION ---
+    let defaultUrl = 'https://gqggririspqrzgzwrbyh.supabase.co';
+    let defaultKey =  'sb_publishable_uhJY_OZNWTQ1xmTpOW6scg_ksAfR5rz';
+
+    let supabase = (defaultUrl && defaultKey) 
+      ? window.supabase.createClient(defaultUrl, defaultKey) 
+      : null;
+
+    const ADMIN_EMAIL = 'contacteihpitchaton@gmail.com';
+    function isAdmin(email) {
+      if (!email) return false;
+      return email.toLowerCase() === ADMIN_EMAIL.toLowerCase() || email.includes('+admin');
+    }    // --- MAIN APP COMPONENT ---
     function App() {
       const [view, setView] = useState('home');
       const [user, setUser] = useState(null);
