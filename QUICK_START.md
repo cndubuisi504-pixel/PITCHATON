@@ -95,9 +95,12 @@ You get 6 pitches across categories, 3 published results, 2 news posts, and two 
 
 ## 6. Going live
 
-Follow [DEPLOYMENT.md](DEPLOYMENT.md). Short version: create a Supabase project → run
-`supabase-schema.sql` → paste three keys into Vercel → deploy → sign up with
-`contacteihpitchaton@gmail.com` and you are the admin.
+Follow [DEPLOYMENT.md](DEPLOYMENT.md). Short version: run `supabase-migrate.sql` (existing project)
+or `supabase-schema.sql` (fresh) in the Supabase SQL editor → add the environment variables in
+Netlify → merge to `main` → sign up with `contacteihpitchaton@gmail.com` and you are the admin.
+
+Then open **`/api/health`** while signed in as admin — it lists every table and the storage bucket with
+a tick or a plain-English fix, so you know the deployment is sound before you share the link.
 
 ---
 

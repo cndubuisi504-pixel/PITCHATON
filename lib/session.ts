@@ -39,7 +39,7 @@ async function getSecret(): Promise<Uint8Array> {
     return cachedSecret;
   }
 
-  if (isProduction && process.env.VERCEL) {
+  if (isProduction && (process.env.NETLIFY || process.env.VERCEL)) {
     // Loud but non-fatal: the app still runs, sessions just don't survive a
     // redeploy. Documented in DEPLOYMENT.md.
     console.warn(

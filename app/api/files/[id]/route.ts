@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { jsonError, jsonOk } from '@/lib/api';
 import { getCurrentUser } from '@/lib/session';
-import { readUpload, removeUpload } from '@/lib/storage';
+import { createSignedDownloadUrl, readUpload, removeUpload } from '@/lib/storage';
 import { getStore, storageDriverName } from '@/lib/store';
 import { isPitchEditable } from '@/lib/utils';
 
@@ -27,9 +27,19 @@ export async function GET(_request: NextRequest, { params }: Params) {
     return jsonError('You do not have access to this file.', 403);
   }
 
-  if (storageDriverName() === 'supabase' && file.file_url) {
-    return NextResponse.redirect(file.file_url, 302);
+  // Supabase Storage: authorise here, then hand the browser a short-lived
+  // signed URL so large files never pass through the serverless function.
+  if (storageDriverName() === 'supabase') {
+    if (!file.storage_path) return jsonError('This file has no stored data.', 410);
+    try {
+      const signedUrl = await createSignedDownloadUrl(file.storage_path);
+      return NextResponse.redirect(signedUrl, 302);
+    } catch (error) {
+      console.error('[pitchaton:sign-download]', error);
+      return jsonError('File is no longer available.', 410);
+    }
   }
+
   if (!file.storage_path) return jsonError('This file has no stored data.', 410);
 
   try {

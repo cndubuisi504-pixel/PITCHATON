@@ -13,7 +13,7 @@ admin is decided by the server — never by the browser.
 `contacteihpitchaton@gmail.com` is the Hub's own address and is treated as an administrator
 automatically.
 
-1. Open your site (locally <http://localhost:3000>, or your Vercel URL).
+1. Open your site (locally <http://localhost:3000>, or your live Netlify URL).
 2. **Submit a pitch** (top right) → **Create your account**.
 3. Full name: whoever manages the Hub. Email: **`contacteihpitchaton@gmail.com`**. Choose a password.
 4. Create the account. You land straight in the **admin console**.
@@ -41,7 +41,8 @@ Anyone else becomes an admin by proving they know the admin access code:
 admins:
 
 * Locally: add `ADMIN_ACCESS_CODE=your-code` to `.env.local`, then restart `npm run dev`.
-* In production: Vercel → Settings → Environment Variables → `ADMIN_ACCESS_CODE` → **Redeploy**.
+* In production: Netlify → Site configuration → Environment variables → `ADMIN_ACCESS_CODE` →
+  **redeploy** (environment changes only apply to new builds).
 
 Generate something unguessable:
 
@@ -106,9 +107,9 @@ Both addresses then sign up normally and become admins without a code.
 
 ## Changing or rotating the access code
 
-1. Vercel → your project → **Settings → Environment Variables**.
+1. Netlify → your site → **Site configuration → Environment variables**.
 2. Edit `ADMIN_ACCESS_CODE` → save.
-3. **Deployments → … → Redeploy** (environment changes only apply to new deployments).
+3. **Deploys → Trigger deploy → Deploy site** (environment changes only apply to new builds).
 4. Tell the other organisers the new code.
 
 Existing admin sessions are unaffected; the new code is required the next time an admin signs up.
@@ -136,8 +137,8 @@ node -e "console.log(require('bcryptjs').hashSync(process.argv[1], 10))" 'NewStr
 Paste the result into `users.password_hash` in Supabase. Their old sessions expire within 7 days;
 changing `SESSION_SECRET` invalidates every session immediately.
 
-**Suspect the service-role key leaked?** Supabase → Project Settings → API → **Rotate**
-`service_role`, paste the new value into Vercel, redeploy.
+**Suspect the service-role key leaked?** Supabase → Project Settings → API keys → **Rotate** the
+`service_role` secret, paste the new value into Netlify, redeploy.
 
 ---
 

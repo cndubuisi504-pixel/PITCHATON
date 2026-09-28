@@ -10,7 +10,7 @@ import type { Store } from './types';
  *   otherwise                          →  local JSON engine (zero setup)
  *
  * This is what lets the same codebase run instantly in local development and
- * on Vercel against a real database, with no code branches anywhere else.
+ * in production against a real database, with no code branches anywhere else.
  */
 function select(): Store {
   return supabaseConfigured ? supabaseStore : localStore;

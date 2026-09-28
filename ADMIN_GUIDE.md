@@ -54,6 +54,11 @@ Statuses: `Submitted → Under review → Accepted → Finalist → Winner`, plu
 with contacts, downloadable attachments, and any recorded result. The same panel has lock, winner and
 delete actions.
 
+**Attachments are private.** Files live in a private Supabase Storage bucket; nothing has a permanent
+public link. Clicking a download asks the server to check that you own the file — or are an admin —
+and only then hands out a URL that expires after two minutes. A link forwarded by email is dead almost
+immediately, and a founder cannot fetch another team's file even with the exact URL.
+
 **Export** — *Export CSV* downloads every pitch with founders, contacts, file counts, statuses and
 results. Sixteen columns, spreadsheet-ready, ideal for semester records.
 
@@ -134,6 +139,18 @@ Changes apply immediately — no redeploy, no waiting.
 **Platform health** — shows whether you are on Supabase Postgres + Storage (production) or the local
 file store (development), and whether email delivery is live.
 
+**Full diagnostic** — open **`/api/health`** in a browser tab while signed in as an admin. You get the
+Supabase host, one line per table (`✓ reachable` / `✗ missing — run supabase-schema.sql`), the storage
+bucket, the current settings row, and a plain-English verdict at the bottom. Logged-out visitors see
+only a one-line status, so nothing sensitive leaks. The same report is available from a terminal:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=… SUPABASE_SERVICE_ROLE_KEY=… npm run check:supabase
+```
+
+Run it once after deploying and any time something looks off — it names the exact fix rather than
+leaving you guessing between "wrong key", "missing table" and "bucket not created".
+
 **Email log** — the last 100 messages the platform generated, with status:
 
 | Status | Meaning |
@@ -198,3 +215,4 @@ as described in [DEPLOYMENT.md → Starting a new semester](DEPLOYMENT.md#starti
 | Take the ranking down | Results | **Unpublish results** |
 | Record scores | Results | Manual entry or Batch upload |
 | Archive everything | Pitches | Export CSV |
+| Check the deployment is healthy | — | Open `/api/health` (admin) or `npm run check:supabase` |

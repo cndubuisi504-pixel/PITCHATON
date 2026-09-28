@@ -21,7 +21,6 @@ import type { PitchFile } from './types';
  */
 
 export interface StoredUpload {
-  file_url: string;
   storage_path: string;
 }
 
@@ -49,6 +48,10 @@ export function safeFileName(name: string): string {
   return cleaned || 'file';
 }
 
+/**
+ * Object key. The bucket is private, but keys still carry a random component so
+ * a leaked signed URL cannot be replayed against another object.
+ */
 export function storageKey(pitchId: string, fileName: string): string {
   const stamp = Date.now().toString(36);
   const random = crypto.randomBytes(4).toString('hex');
@@ -71,14 +74,13 @@ export async function saveUpload(params: {
         upsert: false,
       });
     if (error) throw new Error(`Upload failed: ${error.message}`);
-    const { data } = supabase().storage.from(config.supabase.bucket).getPublicUrl(key);
-    return { file_url: data.publicUrl, storage_path: key };
+    return { storage_path: key };
   }
 
   const diskPath = path.join(LOCAL_UPLOAD_DIR, ...key.split('/'));
   await fs.mkdir(path.dirname(diskPath), { recursive: true });
   await fs.writeFile(diskPath, params.bytes);
-  return { file_url: '', storage_path: key };
+  return { storage_path: key };
 }
 
 export async function readUpload(storagePath: string): Promise<Buffer> {
@@ -104,7 +106,7 @@ export async function removeUpload(file: Pick<PitchFile, 'storage_path'>): Promi
 /**
  * Direct-to-Supabase upload ticket.
  *
- * Vercel (and most serverless hosts) cap request bodies at ~4.5MB, so a 50MB
+ * Serverless functions (Netlify ~6MB, Vercel ~4.5MB) cap request bodies, so a 50MB
  * deck cannot travel through a route handler in production. Instead the server
  * authorises the upload and hands the browser a one-shot signed URL; the bytes
  * go straight from the founder's device into Supabase Storage.
@@ -128,10 +130,26 @@ export async function createSignedUpload(params: {
   return { path: data.path, token: data.token, signedUrl: data.signedUrl };
 }
 
-export function publicUrlFor(storagePath: string): string {
-  if (!supabaseConfigured) return '';
-  const { data } = supabase().storage.from(config.supabase.bucket).getPublicUrl(storagePath);
-  return data.publicUrl;
+/**
+ * Short-lived download URL for one object.
+ *
+ * The `pitch-files` bucket is PRIVATE: nothing is readable without a URL the
+ * server mints after it has authorised the caller. `/api/files/:id` does that
+ * check and then redirects here, so 50MB attachments are served straight from
+ * Storage instead of being streamed through a serverless function.
+ */
+export async function createSignedDownloadUrl(
+  storagePath: string,
+  expiresInSeconds = 120,
+): Promise<string> {
+  if (!supabaseConfigured) throw new Error('Signed download links require Supabase Storage');
+  const { data, error } = await supabase()
+    .storage.from(config.supabase.bucket)
+    .createSignedUrl(storagePath, expiresInSeconds);
+  if (error || !data?.signedUrl) {
+    throw new Error(`Could not sign the download: ${error?.message ?? 'unknown error'}`);
+  }
+  return data.signedUrl;
 }
 
 export function downloadUrlFor(file: PitchFile, driver: 'local' | 'supabase'): string {

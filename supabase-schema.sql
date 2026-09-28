@@ -241,21 +241,36 @@ begin
 end $$;
 
 -- ---------------------------------------------------------------------------
--- Storage bucket for pitch attachments (public read, server-side writes)
+-- Storage bucket for pitch attachments — PRIVATE
 -- ---------------------------------------------------------------------------
+-- The bucket is deliberately private: no policy grants anonymous read, so an
+-- object cannot be fetched from a guessed or leaked URL.
+--
+-- Downloads flow through the app:
+--   GET /api/files/:id  →  checks the caller owns the pitch (or is an admin)
+--                       →  mints a signed URL valid for 120 seconds
+--                       →  302 redirect straight to Supabase Storage
+--
+-- That keeps attachments readable only by the submission's team and the Hub,
+-- while still letting 50MB decks stream from Storage rather than through a
+-- serverless function.
 insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values ('pitch-files', 'pitch-files', true, 52428800, null)
+values ('pitch-files', 'pitch-files', false, 52428800, null)
 on conflict (id) do update
-  set public = true,
+  set public = false,
       file_size_limit = 52428800;
 
--- Only the service role may write; anyone may read objects (needed for
--- download links that the API already authorised).
+-- If an earlier run of this file created a public-read policy, remove it.
 drop policy if exists "pitch_files_public_read" on storage.objects;
-create policy "pitch_files_public_read"
-  on storage.objects for select
+
+-- Belt and braces: explicitly deny anonymous access to every object, so even
+-- if a permissive policy is added later by mistake, anon cannot read.
+drop policy if exists "pitch_files_deny_anon" on storage.objects;
+create policy "pitch_files_deny_anon"
+  on storage.objects for all
   to anon, authenticated
-  using (bucket_id = 'pitch-files');
+  using (false)
+  with check (false);
 
 -- ============================================================================
 -- OPTIONAL: create the Hub admin account from SQL

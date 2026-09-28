@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { jsonError, jsonOk, publicFile, readJson } from '@/lib/api';
 import { getCurrentUser } from '@/lib/session';
 import { getStore } from '@/lib/store';
-import { publicUrlFor, safeFileName } from '@/lib/storage';
+import { safeFileName } from '@/lib/storage';
 import { authoriseUpload } from '@/lib/uploads';
 import { asObject } from '@/lib/validation';
 
@@ -55,12 +55,14 @@ export async function POST(request: NextRequest, { params }: Params) {
     const record = await store.addFile({
       pitch_id: id,
       file_name: file.file_name,
-      file_url: publicUrlFor(file.storage_path) || `/api/files/pending`,
+      // The bucket is private, so the durable reference is our own
+      // access-checked download route (resolved once the id exists).
+      file_url: '',
       file_type: file.file_type,
       file_size: file.file_size,
       storage_path: file.storage_path,
     });
-    created.push(record);
+    created.push(await store.updateFile(record.id, { file_url: `/api/files/${record.id}` }));
   }
 
   return jsonOk({ files: created.map(publicFile) }, { status: 201 });

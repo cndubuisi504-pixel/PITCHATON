@@ -1,0 +1,27 @@
+# Netlify build settings for PITCHATON.
+#
+# Netlify detects Next.js automatically and installs the Next.js Runtime
+# (@netlify/plugin-nextjs) for you — no plugin entry needed here.
+#
+# Environment variables are NOT stored in this file (it is committed).
+# Set them in Netlify → Site configuration → Environment variables:
+#   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY,
+#   SUPABASE_SERVICE_ROLE_KEY, SESSION_SECRET, NEXT_PUBLIC_SITE_URL,
+#   ADMIN_EMAILS, ADMIN_ACCESS_CODE (+ optional RESEND_API_KEY)
+# See DEPLOYMENT.md for the exact values.
+
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # Netlify's default Node is fine, but pin it so builds are reproducible.
+  NODE_VERSION = "22"
+  NEXT_TELEMETRY_DISABLED = "1"
+
+# The platform must never fall back to the local file store in production —
+# Netlify's filesystem is read-only and ephemeral. If the Supabase variables are
+# missing, the app still serves but nothing persists; /api/health reports it.
+[dev]
+  command = "npm run dev"
+  targetPort = 3000

@@ -55,7 +55,7 @@ storage driver switches automatically. See [QUICK_START.md](QUICK_START.md) for 
 | Data | Supabase Postgres + Storage (free tier) | Managed, RLS-capable, generous free limits |
 | Auth | Own session cookies (bcrypt + `jose` HS256 JWT) | No third-party auth dependency, fully server-side role checks |
 | Email | Resend (free tier, 3,000/month) | Simple API, no card required |
-| Hosting | Vercel | Push to deploy, HTTPS by default |
+| Hosting | Netlify (free tier) | Connected to this repo: merge to `main` to deploy, HTTPS by default |
 
 **Two storage drivers, one interface.** `lib/store/local.ts` (JSON file + disk) and
 `lib/store/supabase.ts` (Postgres + Storage) implement the same `Store` contract. The driver is picked
@@ -203,10 +203,11 @@ Every mutation returns `null`-safe JSON and forces `Cache-Control: no-store`.
 * **50 MB per file**, 10 files per pitch, 120 MB total per pitch.
 * **Production:** the browser uploads straight to Supabase Storage using a one-shot signed URL the
   server issues only after checking ownership and the edit window. That bypasses serverless
-  request-body limits (Vercel caps them at ~4.5 MB), so a 50 MB deck really does work.
+  request-body limits (Netlify functions buffer ~6 MB), so a 50 MB deck really does work.
 * **Local dev:** uploads proxy through `/api/pitches/:id/files`.
-* Downloads always route through `/api/files/:id`, which authorises the caller first. Internal storage
-  paths are stripped from every API response.
+* Downloads always route through `/api/files/:id`, which authorises the caller first. The bucket is
+  **private**: the route mints a short-lived (120 s) signed URL and redirects. Internal storage paths
+  are stripped from every API response.
 
 ---
 
@@ -251,9 +252,11 @@ To rebrand: change `lime`/`charcoal` in `tailwind.config.ts`, and the hub/instit
 | Symptom | Fix |
 | --- | --- |
 | Data “disappeared” after adding Supabase keys | You switched drivers. Local demo data lives in `.data/db.json`; Supabase is a separate database. Run `supabase-schema.sql` and sign up again. |
-| Everyone is logged out after a redeploy | `SESSION_SECRET` is unset. Set it in Vercel and redeploy. |
+| Everyone is logged out after a redeploy | `SESSION_SECRET` is unset. Set it in Netlify and redeploy. |
+| Live site shows demo data, submissions vanish | `SUPABASE_SERVICE_ROLE_KEY` is missing, so the app fell back to the ephemeral local store. Netlify's filesystem is read-only. |
+| Unsure whether Supabase is wired up correctly | Open `/api/health` as an admin, or run `npm run check:supabase` with the same credentials. Both name the exact fix. |
 | Emails never arrive | `RESEND_API_KEY` unset, or the recipient domain is not verified in Resend. Messages still appear in **Settings → Email log** with status `queued`. |
-| Upload fails on a huge file in production | Confirm the Supabase bucket exists (the SQL creates `pitch-files` with a 50 MB cap). The client falls back to the proxied path if signing fails — keep files under ~4 MB when Supabase is not configured. |
+| Upload fails on a huge file in production | Confirm the Supabase bucket exists and is private (the SQL creates `pitch-files` with a 50 MB cap). The client falls back to the proxied path if signing fails — keep files small when Supabase is not configured. |
 | `npm run dev` port already in use | `npm run dev -- -p 3001` |
 | Admin console says “restricted” | That account is a founder. Add it to `ADMIN_EMAILS` or re-sign-up with the admin access code. |
 | Reset the local demo data | `npm run seed:demo` (local driver only; it refuses to run when Supabase keys are set) |
@@ -276,14 +279,23 @@ To rebrand: change `lime`/`charcoal` in `tailwind.config.ts`, and the hub/instit
   `grep -rl "SUPABASE_SERVICE_ROLE_KEY" .next/static` after a build — it should return nothing.
 
 **If you are upgrading from the earlier single-file prototype:** that build shipped a Supabase URL and
-key inside the HTML. Treat that key as compromised and rotate it in the Supabase dashboard before
-going live; this codebase reads every credential from environment variables instead.
+key inside the HTML, wrote to the database straight from the browser (no Row Level Security), and
+never created its tables. Two things to do before going live:
+
+1. Rotate the key that was in that file (Supabase → Project Settings → API keys).
+2. Run [`supabase-migrate.sql`](supabase-migrate.sql) once to rebuild the PITCHATON tables with RLS
+   enabled and deny-all policies, so the browser can no longer reach the data directly. It only
+   touches those eight tables — `auth.users`, storage objects and unrelated tables are left alone.
+
+This codebase reads every credential from environment variables and performs all role checks on the
+server.
 
 ---
 
 ## Docs
 
 * [QUICK_START.md](QUICK_START.md) — running locally in five minutes
-* [DEPLOYMENT.md](DEPLOYMENT.md) — Supabase + Vercel in fifteen minutes
+* [DEPLOYMENT.md](DEPLOYMENT.md) — Supabase + Netlify in fifteen minutes, including the
+  `/api/health` post-deploy check
 * [ADMIN_GUIDE.md](ADMIN_GUIDE.md) — running a semester from the admin console
 * [SETUP_ADMIN.md](SETUP_ADMIN.md) — admin accounts, the access code, and revoking access

@@ -75,16 +75,12 @@ export async function POST(request: NextRequest, { params }: Params) {
     const record = await store.addFile({
       pitch_id: id,
       file_name: file.name,
-      file_url: stored.file_url,
+      file_url: '',
       file_type: file.type || null,
       file_size: file.size,
       storage_path: stored.storage_path,
     });
-    if (!stored.file_url) {
-      added.push(await store.updateFile(record.id, { file_url: `/api/files/${record.id}` }));
-    } else {
-      added.push(record);
-    }
+    added.push(await store.updateFile(record.id, { file_url: `/api/files/${record.id}` }));
   }
 
   return jsonOk({ files: added.map(publicFile) }, { status: 201 });

@@ -48,7 +48,7 @@ export function rateLimit(
   return { ok: true, remaining: limit - bucket.count, retryAfterSeconds: 0 };
 }
 
-/** Best-effort client IP from proxy headers (Vercel + generic proxies). */
+/** Best-effort client IP from proxy headers (Netlify, Vercel + generic proxies). */
 export function clientIp(headers: Headers): string {
   const forwarded = headers.get('x-forwarded-for');
   if (forwarded) return forwarded.split(',')[0].trim();

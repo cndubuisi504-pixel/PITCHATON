@@ -128,9 +128,7 @@ export const supabaseStore: Store = {
   },
 
   async countUsers() {
-    const { count, error } = await db()
-      .from('users')
-      .select('id', { count: 'exact', head: true });
+    const { count, error } = await db().from('users').select('id', { count: 'exact' }).limit(1);
     if (error) throw new Error(error.message);
     return count ?? 0;
   },
@@ -138,8 +136,9 @@ export const supabaseStore: Store = {
   async countAdmins() {
     const { count, error } = await db()
       .from('users')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'admin');
+      .select('id', { count: 'exact' })
+      .eq('role', 'admin')
+      .limit(1);
     if (error) throw new Error(error.message);
     return count ?? 0;
   },
