@@ -1,0 +1,174 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ------------------------------------------------------------------ *
+ * PITCHATON design foundation
+ *
+ * Type scale is tight and product-y; contrast targets WCAG AA on the
+ * charcoal background (body copy ≥ 7:1, secondary copy ≥ 4.5:1).
+ * ------------------------------------------------------------------ */
+
+@layer base {
+  :root {
+    --font-sans: 'Inter Variable', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --font-mono: 'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, monospace;
+    --ring: #d3ff01;
+    --surface: #1a1a1a;
+    --hairline: rgba(255, 255, 255, 0.08);
+    color-scheme: dark;
+  }
+
+  * {
+    @apply border-white/[0.08];
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-charcoal-950 text-mute-100 antialiased;
+    font-family: var(--font-sans);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'ss01';
+    text-rendering: optimizeLegibility;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-white font-semibold tracking-[-0.02em] text-balance;
+  }
+
+  ::selection {
+    background: rgba(211, 255, 1, 0.28);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  /* Slim, unobtrusive scrollbars that keep the dark canvas feeling clean. */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #3d3d3d;
+    border: 2px solid #0f0f10;
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4d4d4d;
+  }
+
+  input,
+  textarea,
+  select {
+    color-scheme: dark;
+  }
+
+  /* Kill the iOS zoom-on-focus by keeping form text ≥ 16px on small screens. */
+  @media (max-width: 640px) {
+    input,
+    textarea,
+    select {
+      font-size: 16px;
+    }
+  }
+}
+
+@layer components {
+  /* Layout shell ---------------------------------------------------- */
+  .shell {
+    @apply mx-auto w-full max-w-[76rem] px-5 sm:px-6 lg:px-8;
+  }
+
+  .section {
+    @apply py-16 sm:py-20 lg:py-24;
+  }
+
+  .eyebrow {
+    @apply text-2xs font-semibold uppercase tracking-[0.22em] text-lime;
+  }
+
+  .card {
+    @apply rounded-2xl border border-white/[0.07] bg-charcoal-900/80 shadow-card backdrop-blur-[2px];
+  }
+
+  .card-interactive {
+    @apply card transition duration-200 hover:border-lime/35 hover:bg-charcoal-850
+      motion-safe:hover:-translate-y-0.5;
+  }
+
+  .hairline {
+    @apply border-t border-white/[0.07];
+  }
+
+  .muted {
+    @apply text-mute-400;
+  }
+
+  /* Text that must stay legible on lime buttons */
+  .on-lime {
+    @apply text-charcoal-950;
+  }
+
+  .grid-backdrop {
+    @apply bg-grid-fade;
+    background-size: 56px 56px;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .text-pretty {
+    text-wrap: pretty;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .animate-in {
+    @apply animate-fade-up;
+  }
+
+  /* Skeleton shimmer used while data loads */
+  .shimmer {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+    animation: shimmer 1.8s infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .animate-in,
+    .shimmer::after {
+      animation: none !important;
+    }
+    html {
+      scroll-behavior: auto;
+    }
+  }
+}
