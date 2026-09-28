@@ -37,10 +37,20 @@ Anyone else becomes an admin by proving they know the admin access code:
 2. They tick **“I'm an administrator”** — an “Admin access code” field appears.
 3. They enter the code and create the account.
 
-The default code is `PITCHATON-ADMIN`. **Change it before your site is public:**
+**There is no built-in code.** You choose it, and until you do, only the allow-listed addresses can be
+admins:
 
-* Locally: `ADMIN_ACCESS_CODE=your-new-code` in `.env.local`, restart `npm run dev`.
+* Locally: add `ADMIN_ACCESS_CODE=your-code` to `.env.local`, then restart `npm run dev`.
 * In production: Vercel → Settings → Environment Variables → `ADMIN_ACCESS_CODE` → **Redeploy**.
+
+Generate something unguessable:
+
+```bash
+node -e "console.log('HUB-' + require('crypto').randomBytes(9).toString('hex'))"
+```
+
+If the code is unset, the admin console shows a reminder in **Settings → Access control**, and admin
+claims from non-allow-listed addresses are refused with a clear message.
 
 Test accounts work the same way: sign up `you+admin@gmail.com` **and enter the code**.
 
@@ -86,7 +96,8 @@ Both addresses then sign up normally and become admins without a code.
 | --- | --- |
 | `contacteihpitchaton@gmail.com` signs up (any code, or none) | **Admin** |
 | First ever signup on an empty database with an allow-listed address | **Admin** (bootstrap) |
-| Any address + correct access code | **Admin** |
+| Any address + correct access code (once you have set one) | **Admin** |
+| Claiming admin when no access code is configured | **Rejected** — allow-list only |
 | Any address + wrong or missing code | **Rejected** — “An admin access code is required…” |
 | Any address without claiming admin | **Founder** |
 | `someone+admin@gmail.com` without a code | **Founder** (by design) |
@@ -152,6 +163,7 @@ changing `SESSION_SECRET` invalidates every session immediately.
 | --- | --- |
 | “An admin access code is required…” | Tick **“I'm an administrator”** on the signup form, or use an address from `ADMIN_EMAILS`. |
 | “That admin access code is not valid.” | The value does not match `ADMIN_ACCESS_CODE` (check for trailing spaces, and redeploy after changing it). |
+| “Admin signup is closed on this deployment…” | `ADMIN_ACCESS_CODE` is not set. Set it in your environment and redeploy. |
 | Signed up as the Hub address but got founder access | That row was created before `ADMIN_EMAILS` included it — set `role = 'admin'` in Supabase → `users`. |
 | `/admin` bounces to `/dashboard?denied=admin` | You are signed in as a founder. Log out, sign in as an admin, or promote the account. |
 | Everyone was logged out | `SESSION_SECRET` changed or was never set. Set it and redeploy. |

@@ -11,6 +11,7 @@ interface Health {
   storage: 'local' | 'supabase';
   database: 'local' | 'supabase';
   email: 'resend' | 'log-only';
+  adminCodeConfigured: boolean;
 }
 
 interface EmailStatus {
@@ -339,6 +340,13 @@ export function SettingsTab({
             else needs the admin access code (<span className="font-mono">ADMIN_ACCESS_CODE</span>) once, at
             signup. Role checks run on every request, so revoking access takes effect immediately.
           </p>
+          {!health.adminCodeConfigured && (
+            <p className="mt-3 rounded-lg border border-status-review/30 bg-status-review/[0.08] px-3 py-2 text-xs leading-relaxed text-status-review">
+              No admin access code is set on this deployment, so only addresses in{' '}
+              <span className="font-mono">ADMIN_EMAILS</span> can hold admin rights. Set{' '}
+              <span className="font-mono">ADMIN_ACCESS_CODE</span> before inviting another organiser.
+            </p>
+          )}
         </div>
       </div>
     </div>

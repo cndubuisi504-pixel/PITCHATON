@@ -102,7 +102,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 | Variable | Value | Why |
 | --- | --- | --- |
 | `ADMIN_EMAILS` | `contacteihpitchaton@gmail.com` | This address is always an admin |
-| `ADMIN_ACCESS_CODE` | e.g. `HUB-ENUGU-2026` | Required for any *other* admin account. Change it from the default. |
+| `ADMIN_ACCESS_CODE` | e.g. `HUB-ENUGU-a1b2c3` | Required for any *other* admin account. There is no built-in default — leave it unset and only `ADMIN_EMAILS` can be admins. |
 | `NEXT_PUBLIC_HUB_NAME` | `ICT Hub` | Header, footer, emails |
 | `NEXT_PUBLIC_INSTITUTION_NAME` | `ICT Hub · Enugu, Nigeria` | Footer and email footer |
 

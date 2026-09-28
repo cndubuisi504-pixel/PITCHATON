@@ -209,7 +209,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
                 <Field
                   label="Admin access code"
                   htmlFor="admin_code"
-                  hint="Issued by the Hub lead. Leave blank if this is the official Hub address."
+                  hint="Issued by the Hub lead. Not required for the official Hub address."
                 >
                   <div className="relative">
                     <KeyRound className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-mute-500" aria-hidden />
@@ -217,7 +217,7 @@ export function AuthForm({ mode, nextPath }: AuthFormProps) {
                       id="admin_code"
                       value={adminCode}
                       onChange={(event) => setAdminCode(event.target.value)}
-                      placeholder="PITCHATON-ADMIN"
+                      placeholder="Access code"
                       className="pl-9"
                       autoComplete="off"
                     />

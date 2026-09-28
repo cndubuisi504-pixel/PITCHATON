@@ -80,6 +80,7 @@ export default async function AdminPage() {
           storage: storageDriverName(),
           database: supabaseConfigured ? 'supabase' : 'local',
           email: emailsConfigured ? 'resend' : 'log-only',
+          adminCodeConfigured: Boolean(config.adminAccessCode),
         }}
         emailStatus={{
           emails,

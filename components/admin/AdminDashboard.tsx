@@ -44,7 +44,12 @@ export interface AdminDashboardProps {
     published_at: string;
     featured_pitch: { id: string; code: string; title: string } | null;
   }>;
-  health: { storage: 'local' | 'supabase'; database: 'local' | 'supabase'; email: 'resend' | 'log-only' };
+  health: {
+    storage: 'local' | 'supabase';
+    database: 'local' | 'supabase';
+    email: 'resend' | 'log-only';
+    adminCodeConfigured: boolean;
+  };
   emailStatus: { emails: EmailLogEntry[]; configured: boolean; from: string; adminInbox: string };
   stats: {
     totalPitches: number;

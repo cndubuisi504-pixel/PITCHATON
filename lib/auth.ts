@@ -68,6 +68,11 @@ export async function resolveSignupRole(input: ClaimInput): Promise<ClaimDecisio
   const store = getStore();
   const provided = (input.adminCode ?? '').trim();
 
+  if (!config.adminAccessCode) {
+    throw new AdminClaimError(
+      'Admin signup is closed on this deployment: no access code is configured, so only the Hub address can be an administrator.',
+    );
+  }
   if (provided && provided === config.adminAccessCode) {
     return { role: 'admin', reason: 'admin-code' };
   }

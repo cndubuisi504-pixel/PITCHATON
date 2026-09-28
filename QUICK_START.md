@@ -76,7 +76,8 @@ You get 6 pitches across categories, 3 published results, 2 news posts, and two 
 | Call `GET /api/admin/overview` with a founder cookie | `403 {"error":"Admins only."}` |
 | Sign up and tick “I'm an administrator”, leave the code blank | `403` — the code is required |
 | Sign up `someone+admin@gmail.com` without the code | Normal **founder** account (the `+admin` shortcut is intentionally not honoured) |
-| Sign up with the code `PITCHATON-ADMIN` | Admin account, full console access |
+| Sign up with the code you set in `ADMIN_ACCESS_CODE` | Admin account, full console access |
+| Sign up ticking “I'm an administrator” when no code is configured | `403` — only `ADMIN_EMAILS` addresses can be admins |
 | Enter the wrong password 9 times | Rate limited (`429`) |
 
 ---
@@ -85,7 +86,8 @@ You get 6 pitches across categories, 3 published results, 2 news posts, and two 
 
 * **Deadlines & competition date** → Admin → Settings (drives the public countdown).
 * **Branding** → Admin → Settings (hub name, institution line) and `tailwind.config.ts` for colours.
-* **Admin access code** → `ADMIN_ACCESS_CODE` in `.env.local` (change it before going public).
+* **Admin access code** → `ADMIN_ACCESS_CODE` in `.env.local`. There is no default: leave it unset and
+  only the addresses in `ADMIN_EMAILS` can be admins. Set it to invite another organiser.
 * **Logo** → not required; the header is a typographic lockup. Drop an image into `public/` and swap it
   into `components/Navigation.tsx` if you want one.
 

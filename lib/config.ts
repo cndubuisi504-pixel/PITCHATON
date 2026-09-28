@@ -28,13 +28,14 @@ export const config = {
   ]),
 
   /**
-   * Secret every admin must enter once, on the signup form, to mint an admin
-   * account. This is the "admin key" — change it in Vercel before going live.
+   * Secret an organiser must enter once, on the signup form, to mint an admin
+   * account beyond the allow-listed addresses.
+   *
+   * There is deliberately NO built-in fallback: if this is unset, only
+   * addresses in `adminEmails` can become admins. That keeps a forgotten
+   * environment variable from leaving a guessable code live in production.
    */
-  adminAccessCode: process.env.ADMIN_ACCESS_CODE?.trim() || 'PITCHATON-ADMIN',
-
-  /** Typed code the client sends when the user ticks "I'm an administrator". */
-  adminClaimToken: process.env.ADMIN_CLAIM_TOKEN?.trim() || 'ADMIN',
+  adminAccessCode: process.env.ADMIN_ACCESS_CODE?.trim() || null,
 
   session: {
     secret: process.env.SESSION_SECRET?.trim() || '',

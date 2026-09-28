@@ -129,7 +129,7 @@ sends or stores a role claim.**
 | Situation | Result |
 | --- | --- |
 | Email is in `ADMIN_EMAILS` (default `contacteihpitchaton@gmail.com`) | **Admin**, no code needed |
-| Signs up ticking “I'm an administrator” with the correct `ADMIN_ACCESS_CODE` | **Admin** |
+| Signs up ticking “I'm an administrator” with the correct `ADMIN_ACCESS_CODE` | **Admin** (code must be configured — there is no built-in default) |
 | Signs up ticking “I'm an administrator” without a valid code | **Rejected** (403) |
 | Everyone else | **Founder** |
 
